@@ -9,8 +9,7 @@ watching is the **governed pathway**: the control, the gate, the audit trail."
 
 ## Pre-flight (verified against Factory docs 2026-09-04)
 ```bash
-# install (once):
-curl -fsSL https://app.factory.ai/cli | sh        # or: brew install --cask droid
+# install (once): ALREADY DONE on this machine — droid 0.212.1 via `brew install --cask droid`
 export FACTORY_API_KEY=fk-...                      # from app.factory.ai/settings/api-keys
 cd ai-demos/factory-demo
 # smoke test (cheap):
