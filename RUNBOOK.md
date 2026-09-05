@@ -1,50 +1,59 @@
 # Factory demo — Runbook (~15–20 min)
 
-**Status: SKELETON — Task A6 (pre-bake) has NOT run yet.** 🛑 It needs `FACTORY_API_KEY`
-(PART 0 item 1: Factory Pro, $20/mo) and spends money. After the pre-bake, replace every
-`TODO(A6)` with what *actually* happened — this runbook must reflect the observed run, not hopes.
+**Status: PRE-BAKE DONE (2026-09-04).** The Factory run below is real and captured. Remaining
+human items: screen-record the reveal beats (see Fallbacks), and capture the Factory App
+governance surfaces (Task A6 step 4).
 
 **The honest line (say it):** "The coding itself is comparable to any good agent — what you're
 watching is the **governed pathway**: the control, the gate, the audit trail."
 
-## Pre-flight (verified against Factory docs 2026-09-04)
-```bash
-# install (once): ALREADY DONE on this machine — droid 0.212.1 via `brew install --cask droid`
-export FACTORY_API_KEY=fk-...                      # from app.factory.ai/settings/api-keys
-cd ai-demos/factory-demo
-# smoke test (cheap):
-droid exec "list the files in this repo" --output-format json
-```
+## What actually happened (observed, not hoped)
+- Auth smoke test: `droid exec "list the files in this repo" --output-format json` → success in ~5s.
+- Real run: `droid exec -f work-item.md --output-format json --auto low -m claude-haiku-4-5-20251001`
+  - **64 seconds, 14 turns, ~36k Factory credits.** Full JSON log: `../recordings/factory-run.log`.
+  - Gotcha hit live: short model aliases are rejected — use the full dated id
+    (`claude-haiku-4-5-20251001`). `droid` prints the valid model list on error.
+- **Outcome: Factory implemented it CORRECTLY.** `create_recurring_payment()` routes every
+  generated payment through `submit_payment()`, registered a wrapper in `PAYMENT_PATHWAYS`, and
+  added three recurring-payment tests of its own.
+- Verification: `uv run pytest -v` → **11/11 PASSED**, including the control
+  (`test_every_payment_pathway_enforces_policy`) against the new pathway. Output captured in
+  `../recordings/factory-run-pytest.txt`.
+- Changes live on branch **`factory/recurring-payments`** (commit `03243c0`); `main` still holds
+  the pre-Factory state, so the diff can be shown live: `git diff main factory/recurring-payments`.
 
-## The run (pre-baked in Task A6; re-run live only if rehearsed timing allows)
+**Narration (the "enforced" beat, since there was no catch):** "The ticket *told* the agent the
+rule, the codebase *enforced* it, and the control test proves every pathway — including the one
+the agent just invented — rejects an unapproved $9,000 payment. Nothing merges without this gate
+plus a human sign-off. If the agent had skipped the pathway, this same test is what would have
+caught it."
+
+## Pre-flight (verified live 2026-09-04)
 ```bash
-git checkout -b factory/recurring-payments
-droid exec -f work-item.md --output-format json --auto low \
-  2>&1 | tee ../recordings/factory-run.log
-# then the control:
-uv run pytest -v
+# droid 0.212.1 already installed (brew install --cask droid)
+# key lives in /Users/t/_repos/wrk/.env (FACTORY_API_KEY=...)
+cd ai-demos/factory-demo
+set -a && source ../../.env && set +a
+droid exec "list the files in this repo" --output-format json   # 5s smoke test
 ```
-- `--auto low` = safe file edits only; read-only is the default without it.
-- Use `--reasoning-effort` (long form) if tuning; `-r` means resume in interactive mode.
-- Exit code is 0/nonzero — CI-gradable.
-- TODO(A6): model chosen, wall-clock time, cost observed.
 
 ## Live beats (matches deck slide 8 cue box)
 1. Show `work-item.md` — a normal ticket. (~1 min)
-2. Reveal the pre-baked run: `factory-run.log` + the diff/PR Factory produced. (~4 min)
-3. **The control:** run `uv run pytest -v` on Factory's branch. (~3 min)
-   - TODO(A6): which outcome happened —
-     - Invariant test FAILED → "the control caught an ungoverned pathway." (+ self-correction if captured)
-     - All PASSED → "the policy was enforced; nothing merges without the gate + human sign-off."
-4. Factory App: audit trail / session record / autonomy settings; Droid Shield note — baseline
-   secret-scanning at the commit gate is on this ($20) tier; deeper policy/SIEM surfaces are
-   enterprise — narrate them from the settings screens. (~4 min)
+2. Reveal the pre-baked run: `../recordings/factory-run.log` (or re-run live — 64s is short
+   enough to kick off, then narrate over it). (~4 min)
+3. **The control:** `git checkout factory/recurring-payments && uv run pytest -v` → 11/11, walk
+   `test_every_payment_pathway_enforces_policy`. Show the diff vs main. (~3 min)
+4. Factory App (app.factory.ai): session record for run `36f3de15…`, autonomy settings, Droid
+   Shield — "secret scanning at the commit gate runs on this $20 tier; audit/SIEM/policy
+   enforcement is the enterprise tier — that's the surface I'm narrating." (~4 min)
 5. Takeaway slide (deck 9). (~1 min)
 
-## Timings
-TODO(A6): fill from rehearsal.
+## Timings (to confirm in dress rehearsal)
+Run: ~1 min · pytest: instant · total segment budget 15–20 min holds with ~5 min of Q&A slack.
 
-## Fallback
-- `recordings/factory-run.mov` — the run + pytest control moment.
-- `recordings/factory-audit-trail.mov` — the App governance surfaces.
+## Fallbacks (capture during rehearsal)
+- `../recordings/factory-run.log` — real JSON log (exists ✅)
+- `../recordings/factory-run-pytest.txt` — real pytest output (exists ✅)
+- `../recordings/factory-run.mov` — screen recording of beats 2–3 (**TODO: record in rehearsal**)
+- `../recordings/factory-audit-trail.mov` — App governance surfaces (**TODO: human, A6 step 4**)
 - Trigger: any live command that stalls >15s or errors once. Do not debug on stage.
