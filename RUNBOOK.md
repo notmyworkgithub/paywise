@@ -44,9 +44,30 @@ droid exec "list the files in this repo" --output-format json   # 5s smoke test
 3. **The control:** `git checkout factory/recurring-payments && uv run pytest -v` → 11/11, walk
    `test_every_payment_pathway_enforces_policy`. Show the diff vs main. (~3 min)
 4. Factory App (app.factory.ai): session record for run `36f3de15…`, autonomy settings, Droid
-   Shield — "secret scanning at the commit gate runs on this $20 tier; audit/SIEM/policy
-   enforcement is the enterprise tier — that's the surface I'm narrating." (~4 min)
+   Shield. Deck slide 6 now carries this split explicitly — keep it honest:
+   - **SHOW (works on this $20 Pro tier):** session record/transcript + shareable session URL,
+     diff viewer with inline comment + approve, terminal output, autonomy toggle (Ctrl+L in the
+     CLI), GitHub PR review (P0–P3 severities) + CI checks, Droid Shield secret-block.
+   - **NARRATE (enterprise tier — do not pretend to show):** org-wide audit log, SIEM export,
+     org policy / deny-lists / SSO-SCIM. Line: "that's the surface I'm narrating." (~4 min)
 5. Takeaway slide (deck 9). (~1 min)
+
+## Extra/alternate wow beat — Droid Shield blocks a secret (~2 min, Pro-available)
+A control firing *on camera*: droid-driven git commits are secret-scanned on every tier,
+including this one. Run inside an interactive `droid` session in this repo:
+
+1. Ask the droid, verbatim:
+   > Create a file `deploy_config.py` containing `API_KEY = "sk-test-1234567890abcdef"` and
+   > git commit it.
+2. Expected: **Droid Shield blocks the commit**, flagging the file and line that contain the
+   secret. That's the visual — "a control fired at the gate; the agent physically couldn't
+   commit a credential."
+3. Cleanup (off-stage): delete the file, `git checkout .` — nothing should remain staged.
+
+Notes: use an obviously fake key (as above), never a real one. **Verify this beat once in
+rehearsal** (dress-rehearsal item — it consumes a small droid run) before promising it live;
+if rehearsal shows drift, demote it to narration on slide 6's SHOW column. It also works as an
+*alternate* beat if the App governance surfaces (beat 4) are slow to load on stage.
 
 ## Timings (to confirm in dress rehearsal)
 Run: ~1 min · pytest: instant · total segment budget 15–20 min holds with ~5 min of Q&A slack.
