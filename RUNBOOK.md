@@ -28,14 +28,29 @@ the agent just invented — rejects an unapproved $9,000 payment. Nothing merges
 plus a human sign-off. If the agent had skipped the pathway, this same test is what would have
 caught it."
 
-## Pre-flight (verified live 2026-09-04)
+## Pre-flight — REWRITTEN for the `demo` account (verified 2026-09-06)
+The original pre-flight was written on the `t` account and **does not work as typed here**.
+Three things changed:
+
+1. **`droid` is authenticated under `demo`** (`~/.factory` exists, keychain-backed) and
+   self-updated to **0.213.0**. No `FACTORY_API_KEY` env var is needed and the old
+   `source ../../.env` line is dead — `/Users/t/_repos/wrk/.env` is not readable from `demo`.
+2. **`uv` is not on `demo`'s PATH.** It is installed at `/Users/t/.local/bin/uv` and executes
+   fine from here. Either use the full path, or skip uv entirely — the checked-in venv works:
+   `./.venv/bin/python -m pytest -v`. **Decide which one you'll type on stage and rehearse it.**
+3. **git refused this repo** from `demo` ("detected dubious ownership" — it is owned by `t`).
+   Fixed 2026-09-06 with `git config --global --add safe.directory
+   /Users/Shared/ai-demos/factory-demo`. If beat 3 ever errors this way again, that's the fix.
+
 ```bash
-# droid 0.212.1 already installed (brew install --cask droid)
-# key lives in /Users/t/_repos/wrk/.env (FACTORY_API_KEY=...)
-cd ai-demos/factory-demo
-set -a && source ../../.env && set +a
-droid exec "list the files in this repo" --output-format json   # 5s smoke test
+cd /Users/Shared/ai-demos/factory-demo     # or ~/ai-demo/factory-demo
+droid exec "list the files in this repo" --output-format json   # ~5s smoke test
+./.venv/bin/python -m pytest -q            # 8 passed on main
 ```
+
+`droid exec` flags are **unchanged** on 0.213.0 (`-f`, `--output-format`, `--auto`, `-m`, `-r`
+all still valid). Two notes: the default model is now `gpt-5.6-sol`, so keep passing `-m` with
+the full dated Claude id; and a new `--mission` multi-agent mode exists — ignore it on stage.
 
 ## Live beats (matches deck slide 8 cue box)
 1. Show `work-item.md` — a normal ticket. (~1 min)
